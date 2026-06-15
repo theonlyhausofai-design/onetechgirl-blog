@@ -1,0 +1,52 @@
+/* ============================================================
+   OneTechGirl — Typography tokens
+   One voice: Space Grotesk everywhere. Geometric grotesque with
+   round terminals that echo the "oTo" mark. Tight, confident
+   headlines; relaxed, legible body.
+   ============================================================ */
+
+:root {
+  /* Families */
+  --font-display: "Space Grotesk", "Space Grotesk Static", system-ui, sans-serif;
+  --font-sans:    "Space Grotesk", "Space Grotesk Static", system-ui, sans-serif;
+  --font-mono:    ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Weights */
+  --fw-light:    300;   /* @kind other */
+  --fw-regular:  400;   /* @kind other */
+  --fw-medium:   500;   /* @kind other */
+  --fw-semibold: 600;   /* @kind other */
+  --fw-bold:     700;   /* @kind other */
+
+  /* Fluid type scale — display steps echo a 1.25 ratio, clamped */
+  --text-2xs:  0.6875rem;  /* 11px */
+  --text-xs:   0.75rem;    /* 12px */
+  --text-sm:   0.875rem;   /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-md:   1.125rem;   /* 18px */
+  --text-lg:   1.375rem;   /* 22px */
+  --text-xl:   1.75rem;    /* 28px */
+  --text-2xl:  2.25rem;    /* 36px */
+  --text-3xl:  clamp(2.5rem, 5.5vw, 3.5rem);    /* 40 → 56 */
+  --text-4xl:  clamp(3.25rem, 7vw, 5rem);       /* 52 → 80 */
+  --text-5xl:  clamp(4rem, 9vw, 7rem);          /* 64 → 112 */
+
+  /* Line heights */
+  --leading-none:    1;
+  --leading-tight:   1.08;
+  --leading-snug:    1.2;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.65;
+
+  /* Letter spacing — Space Grotesk wants slight negative tracking large, positive in caps */
+  --tracking-tighter: -0.03em;
+  --tracking-tight:   -0.015em;
+  --tracking-normal:  0em;
+  --tracking-wide:    0.04em;
+  --tracking-caps:    0.12em;   /* eyebrows / overlines */
+
+  /* Semantic shorthands (fixed sizes only; compose fluid headings manually) */
+  --font-eyebrow: var(--fw-semibold) var(--text-xs)/var(--leading-snug) var(--font-sans);
+  --font-body:    var(--fw-regular) var(--text-base)/var(--leading-relaxed) var(--font-sans);
+  --font-label:   var(--fw-medium) var(--text-sm)/var(--leading-snug) var(--font-sans);
+}

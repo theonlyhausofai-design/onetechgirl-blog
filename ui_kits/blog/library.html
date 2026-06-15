@@ -1,0 +1,355 @@
+<!-- @dsCard group="Newsletter" viewport="1280x1320" name="Free Library / Resources" subtitle="Filterable grid of free prompts, guides, systems & workflows" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OneTechGirl — Resources</title>
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body { margin: 0; background: var(--bg); color: var(--text); transition: background var(--dur-base) var(--ease-out); }
+  a { color: inherit; text-decoration: none; }
+
+  /* ---- Nav (shared with blog) ---- */
+  .nav { position: sticky; top: 0; z-index: 100; background: rgba(250,250,247,0.85); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+  .nav-in { max-width: var(--container); margin: 0 auto; padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; }
+  .nav .brand { display: flex; align-items: center; gap: 12px; }
+  .nav .brand img { height: 30px; }
+  .nav .brand .mk-dark { display: none; }
+  .nav .brand .bt { display: flex; flex-direction: column; line-height: 1; }
+  .nav .brand b { font: var(--fw-bold) var(--text-md) var(--font-display); letter-spacing: -0.02em; }
+  .nav .brand .tl { font: var(--fw-semibold) var(--text-2xs) var(--font-display); color: var(--coral-600); letter-spacing: 0.04em; text-transform: uppercase; margin-top: 4px; }
+  .nav .links { display: flex; align-items: center; gap: 26px; }
+  .nav .links a { color: var(--text); font: var(--font-label); transition: color var(--dur-fast) var(--ease-out); }
+  .nav .links a:hover, .nav .links a.active { color: var(--coral-600); }
+  .nav .theme { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: transparent; color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--dur-fast) var(--ease-out); }
+  .nav .theme:hover { background: var(--ink-950); color: #fff; border-color: var(--ink-950); }
+  .nav .theme i { width: 18px; height: 18px; }
+  .nav .sub { background: var(--ink-950); color: #fff; padding: 10px 18px; border-radius: var(--radius-pill); font: var(--fw-semibold) var(--text-sm) var(--font-sans); cursor: pointer; transition: transform var(--dur-fast) var(--ease-spring); border: none; }
+  .nav .sub:hover { transform: translateY(-1px); }
+
+  .wrap { max-width: var(--container); margin: 0 auto; padding: 0 40px; }
+
+  /* ---- Masthead ---- */
+  .masthead { margin: 0 0 40px; padding: 64px 0 36px; border-bottom: 2px solid var(--ink-950); }
+  .masthead .eyebrow { display: inline-flex; align-items: center; gap: 9px; font: var(--fw-bold) var(--text-xs) var(--font-sans); text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-700); margin-bottom: 22px; }
+  .masthead .eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lime-500); }
+  .masthead h1 { font-size: var(--text-4xl); line-height: 0.96; letter-spacing: -0.04em; margin: 0 0 18px; max-width: 16ch; }
+  .masthead h1 em { font-style: normal; }
+  .masthead p { font-size: var(--text-md); line-height: 1.55; color: var(--ink-700); max-width: 54ch; margin: 0; }
+  .masthead .count { display: inline-flex; align-items: center; gap: 8px; margin-top: 24px; font: var(--fw-semibold) var(--text-sm) var(--font-mono); color: var(--ink-600); }
+  .masthead .count b { color: var(--ink-950); }
+
+  /* ---- Filters ---- */
+  .filters { position: sticky; top: 73px; z-index: 50; background: var(--bg); padding: 22px 0 18px; margin-bottom: 8px; }
+  .filterrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .filterrow + .filterrow { margin-top: 12px; }
+  .filterrow .lbl { font: var(--fw-bold) var(--text-2xs) var(--font-mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-400); width: 56px; flex: none; }
+  .pill { font: var(--fw-semibold) var(--text-sm) var(--font-sans); padding: 8px 16px; border-radius: var(--radius-pill); border: 1.5px solid var(--border); background: transparent; color: var(--text); cursor: pointer; transition: all var(--dur-fast) var(--ease-out); white-space: nowrap; }
+  .pill:hover { border-color: var(--ink-950); }
+  .pill.active { background: var(--ink-950); color: #fff; border-color: var(--ink-950); }
+  .pill .ct { opacity: 0.5; margin-left: 5px; font-size: 0.85em; }
+  [data-theme="dark"] .pill:hover { border-color: var(--ink-400); }
+  [data-theme="dark"] .pill.active { background: var(--lime-400); color: var(--ink-950); border-color: var(--lime-400); }
+
+  /* ---- Result count + clear ---- */
+  .resbar { display: flex; align-items: center; justify-content: space-between; margin: 18px 0 22px; }
+  .resbar .n { font: var(--text-sm) var(--font-mono); color: var(--text-muted); }
+  .resbar .clear { font: var(--fw-semibold) var(--text-sm) var(--font-sans); color: var(--coral-600); cursor: pointer; display: none; align-items: center; gap: 6px; background: none; border: none; }
+  .resbar .clear i { width: 15px; height: 15px; }
+
+  /* ---- Grid ---- */
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding-bottom: 24px; }
+  .res { display: flex; flex-direction: column; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 26px 26px 22px; transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out); position: relative; }
+  .res:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--ink-950); }
+  .res .top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 18px; }
+  .res .type { font: var(--fw-bold) var(--text-2xs) var(--font-sans); text-transform: uppercase; letter-spacing: 0.08em; padding: 6px 12px; border-radius: var(--radius-pill); }
+  .res .type.prompts { background: var(--lime-400); color: var(--ink-950); }
+  .res .type.workflows { background: transparent; color: var(--ink-950); box-shadow: inset 0 0 0 1.5px var(--ink-950); }
+  .res .type.guides { background: var(--coral-500); color: #fff; }
+  .res .type.templates { background: transparent; color: var(--coral-600); box-shadow: inset 0 0 0 1.5px var(--coral-500); }
+  .res .type.systems { background: var(--ink-950); color: #fff; }
+  .res .star { display: inline-flex; align-items: center; gap: 5px; font: var(--fw-bold) var(--text-2xs) var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-500); }
+  .res .star i { width: 14px; height: 14px; color: var(--lime-600); fill: var(--lime-400); }
+  .res h3 { font-size: var(--text-lg); line-height: 1.12; letter-spacing: -0.02em; margin: 0 0 9px; }
+  .res p { font: var(--font-body); color: var(--ink-600); margin: 0 0 auto; }
+  .res .rfoot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px; flex-wrap: nowrap; }
+  .res .fmt { display: inline-flex; align-items: center; gap: 6px; font: var(--fw-semibold) var(--text-2xs) var(--font-mono); color: var(--ink-500); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; min-width: 0; }
+  .res .fmt i { width: 14px; height: 14px; }
+  .res .get { display: inline-flex; align-items: center; gap: 7px; font: var(--fw-bold) var(--text-sm) var(--font-sans); color: var(--ink-950); border: none; background: none; cursor: pointer; padding: 0; white-space: nowrap; flex: none; }
+  .res .get i { width: 16px; height: 16px; transition: transform var(--dur-base) var(--ease-out); }
+  .res:hover .get i { transform: translate(2px,-2px); }
+  .res .lockchip { position: absolute; top: 26px; right: 26px; }
+  .grid .empty { grid-column: 1 / -1; padding: 60px 4px; text-align: center; color: var(--text-muted); font: var(--font-body); }
+  .grid .empty b { display: block; font: var(--fw-bold) var(--text-lg) var(--font-display); color: var(--text); margin-bottom: 6px; }
+
+  [data-theme="dark"] .res p { color: var(--ink-300); }
+  [data-theme="dark"] .res .type.workflows { color: #fff; box-shadow: inset 0 0 0 1.5px var(--ink-400); }
+  [data-theme="dark"] .res .get { color: #fff; }
+
+  /* ---- Email-gate modal ---- */
+  .modal { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 24px; background: rgba(14,14,16,0.6); backdrop-filter: blur(4px); }
+  .modal.open { display: flex; }
+  .modal .card { background: var(--surface); border: 2px solid var(--ink-950); border-radius: var(--radius-xl); box-shadow: var(--shadow-sticker); width: 100%; max-width: 440px; padding: 36px; position: relative; }
+  .modal .x { position: absolute; top: 18px; right: 18px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); background: transparent; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .modal .x i { width: 16px; height: 16px; }
+  .modal .tag2 { display: inline-block; font: var(--fw-bold) var(--text-2xs) var(--font-sans); text-transform: uppercase; letter-spacing: 0.08em; background: var(--lime-400); color: var(--ink-950); padding: 5px 12px; border-radius: var(--radius-pill); margin-bottom: 16px; }
+  .modal h3 { font-size: var(--text-xl); letter-spacing: -0.02em; margin: 0 0 8px; }
+  .modal p { font: var(--font-body); color: var(--ink-600); margin: 0 0 22px; }
+  .modal form { display: flex; flex-direction: column; gap: 10px; }
+  .modal input { height: 52px; border-radius: var(--radius-pill); border: 1.5px solid var(--ink-950); padding: 0 22px; background: var(--bg); color: var(--text); font: var(--font-body); outline: none; }
+  .modal input:focus { box-shadow: 0 0 0 3px var(--lime-400); }
+  .modal button.go { height: 52px; border: none; border-radius: var(--radius-pill); background: var(--ink-950); color: #fff; font: var(--fw-bold) var(--text-base) var(--font-sans); cursor: pointer; transition: transform var(--dur-fast) var(--ease-spring); }
+  .modal button.go:active { transform: scale(0.97); }
+  .modal .fine { font: var(--text-2xs) var(--font-mono); color: var(--text-muted); margin: 14px 0 0; text-align: center; }
+  [data-theme="dark"] .modal input { border-color: var(--ink-600); }
+
+  /* ---- Footer ---- */
+  .foot { background: var(--ink-950); color: #fff; margin-top: 64px; }
+  .foot .inner { max-width: var(--container); margin: 0 auto; padding: 48px 40px; display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
+  .foot .inner .b b { display: block; font: var(--fw-bold) var(--text-md) var(--font-display); }
+  .foot .inner .b p { color: var(--ink-400); margin: 6px 0 0; font-size: var(--text-sm); }
+  .foot .inner .links { display: flex; gap: 22px; }
+  .foot .inner .links a { color: var(--ink-200); font: var(--font-label); }
+  .foot .inner .links a:hover { color: #fff; }
+  .foot .legal { border-top: 1px solid var(--ink-800); }
+  .foot .legal .inn { max-width: var(--container); margin: 0 auto; padding: 20px 40px; display: flex; justify-content: space-between; font: var(--text-xs) var(--font-mono); color: var(--ink-500); flex-wrap: wrap; gap: 10px; }
+
+  /* ---- Dark mode nav ---- */
+  [data-theme="dark"] .nav { background: rgba(14,14,16,0.82); }
+  [data-theme="dark"] .nav .brand .mk-light { display: none; }
+  [data-theme="dark"] .nav .brand .mk-dark { display: block; }
+  [data-theme="dark"] .nav .sub { background: var(--lime-400); color: var(--ink-950); }
+  [data-theme="dark"] .masthead { border-color: var(--ink-700); }
+  [data-theme="dark"] .masthead p, [data-theme="dark"] .masthead .eyebrow { color: var(--ink-300); }
+
+  @media (max-width: 980px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 880px) {
+    .nav-in { padding: 14px 22px; }
+    .nav .links a:not(.sub) { display: none; }
+    .wrap { padding: 0 22px; }
+    .filters { top: 69px; }
+    .filterrow .lbl { width: 100%; margin-bottom: -4px; }
+  }
+  @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-in">
+      <a class="brand" href="index.html"><img class="mk-light" src="../../assets/mark-oto-black.png" alt="OTG" /><img class="mk-dark" src="../../assets/mark-oto-white.png" alt="OTG" /><span class="bt"><b>OneTechGirl</b><span class="tl">AI &amp; tech, made simple</span></span></a>
+      <div class="links">
+        <a href="index.html">Blog</a>
+        <a href="library.html" class="active">Resources</a>
+        <button class="theme" id="themeBtn" aria-label="Toggle dark mode"><i data-lucide="moon"></i></button>
+        <span class="sub">Subscribe</span>
+      </div>
+    </div>
+  </nav>
+
+  <header class="wrap">
+    <div class="masthead">
+      <span class="eyebrow"><span class="dot"></span>Resources</span>
+      <h1>Everything I make. <em>Free.</em></h1>
+      <p>Prompts, guides, systems, and workflows you can steal today — tested on real work, written in plain English. Filter by what you need.</p>
+      <span class="count"><b id="countNum">0</b>&nbsp;free resources and counting</span>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="filters">
+      <div class="filterrow" id="typeRow">
+        <span class="lbl">Type</span>
+        <button class="pill active" data-type="all">All</button>
+        <button class="pill" data-type="prompts">Prompts</button>
+        <button class="pill" data-type="guides">Guides</button>
+        <button class="pill" data-type="systems">Systems</button>
+        <button class="pill" data-type="workflows">Workflows</button>
+        <button class="pill" data-type="templates">Templates</button>
+      </div>
+      <div class="filterrow" id="topicRow">
+        <span class="lbl">Topic</span>
+        <button class="pill active" data-topic="all">All</button>
+        <button class="pill" data-topic="getting-started">Getting Started</button>
+        <button class="pill" data-topic="writing">Writing</button>
+        <button class="pill" data-topic="marketing">Marketing</button>
+        <button class="pill" data-topic="productivity">Productivity</button>
+        <button class="pill" data-topic="automation">Automation</button>
+      </div>
+    </div>
+
+    <div class="resbar">
+      <span class="n" id="resCount"></span>
+      <button class="clear" id="clearBtn"><i data-lucide="x"></i> Clear filters</button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- Email gate -->
+  <div class="modal" id="modal">
+    <div class="card">
+      <button class="x" id="modalX" aria-label="Close"><i data-lucide="x"></i></button>
+      <span class="tag2">Free download</span>
+      <h3 id="modalTitle">Get the resource</h3>
+      <p id="modalDesc">Drop your email and I'll send it straight to your inbox — plus the weekly Signal.</p>
+      <form id="modalForm" action="https://formspree.io/f/xdavyanq" method="POST">
+        <input type="hidden" name="_subject" id="modalSubject" value="Free Library download" />
+        <input type="email" name="email" placeholder="you@yourbusiness.com" aria-label="Email" required />
+        <button class="go" type="submit">Send it to me</button>
+      </form>
+      <p class="fine" id="modalFine">No spam. Unsubscribe anytime.</p>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <div class="inner">
+      <div class="b"><b>OneTechGirl</b><p>I test the tools so you don't have to.</p></div>
+      <div class="links">
+        <a href="index.html">Blog</a>
+        <a href="library.html">Resources</a>
+        <a href="https://instagram.com/onetechgirl" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <div class="legal"><div class="inn"><span>© 2026 OneTechGirl. Made simple.</span><span>@onetechgirl</span></div></div>
+  </footer>
+
+  <script>
+    var RESOURCES = [
+      { title: "The Starter Prompt Pack", type: "prompts", topic: "getting-started", format: "Swipe file", desc: "10 copy-paste prompts that work for almost any task. The fastest way to start.", pick: true, gated: true },
+      { title: "Email Rewrite Prompts", type: "prompts", topic: "writing", format: "Swipe file", desc: "Turn rough, awkward drafts into clear, warm emails in one paste.", pick: false, gated: false },
+      { title: "Content Repurposing Prompts", type: "prompts", topic: "marketing", format: "Swipe file", desc: "One idea into a week of posts — captions, hooks, and threads.", pick: false, gated: false },
+      { title: "AI for Beginners: Start Here", type: "guides", topic: "getting-started", format: "PDF", desc: "Zero to your first genuinely useful result in an afternoon. No jargon.", pick: true, gated: true },
+      { title: "Prompting 101", type: "guides", topic: "writing", format: "PDF", desc: "The one habit that turns vague, generic answers into useful ones.", pick: false, gated: false },
+      { title: "The Honest Tool Guide", type: "guides", topic: "productivity", format: "PDF", desc: "What to use, what to skip, and what's actually worth paying for.", pick: false, gated: false },
+      { title: "The 30-Minute Content System", type: "systems", topic: "marketing", format: "Notion", desc: "Plan a full week of content in one focused sitting. My exact setup.", pick: true, gated: true },
+      { title: "Inbox Zero with AI", type: "systems", topic: "productivity", format: "Notion", desc: "A repeatable system to clear your inbox fast and keep it clear.", pick: false, gated: false },
+      { title: "The Weekly Review System", type: "systems", topic: "productivity", format: "Notion", desc: "Close out the week and plan the next one in 20 minutes flat.", pick: false, gated: false },
+      { title: "Social Listening on Autopilot", type: "workflows", topic: "automation", format: "Airtable", desc: "Let AI read the feed, filter the noise, and summarize to Slack.", pick: true, gated: true },
+      { title: "Auto-Summarize Long Reads", type: "workflows", topic: "productivity", format: "Workflow", desc: "Send it any link and get the five things that actually matter.", pick: false, gated: false },
+      { title: "Lead Follow-up Workflow", type: "workflows", topic: "marketing", format: "Workflow", desc: "Never let a warm lead go cold again. Set it once, runs itself.", pick: false, gated: false },
+      { title: "Custom GPT Instruction Template", type: "templates", topic: "getting-started", format: "Google Doc", desc: "Fill in the blanks and get a tuned assistant in ten minutes.", pick: false, gated: false },
+      { title: "Content Calendar Template", type: "templates", topic: "marketing", format: "Notion", desc: "A month of posts at a glance — plan, draft, and track in one place.", pick: false, gated: false },
+      { title: "Prompt Library Template", type: "templates", topic: "writing", format: "Notion", desc: "Save, tag, and reuse your best prompts so you stop rewriting them.", pick: false, gated: false },
+      { title: "SOP Template for Small Teams", type: "templates", topic: "productivity", format: "Google Doc", desc: "Document a process once, then delegate it forever. No more bottleneck.", pick: false, gated: false }
+    ];
+
+    var FORMAT_ICON = { "PDF": "file-text", "Notion": "layout-template", "Google Doc": "file", "Swipe file": "copy", "Workflow": "git-branch", "Airtable": "table" };
+    var state = { type: "all", topic: "all" };
+
+    function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+
+    function cardHTML(r){
+      var icon = FORMAT_ICON[r.format] || "file";
+      var star = r.pick ? '<span class="star"><i data-lucide="star"></i> oTg Pick</span>' : '';
+      var btn = r.gated ? 'Get it free' : 'Download';
+      var bicon = r.gated ? 'arrow-up-right' : 'download';
+      return '<div class="res" data-type="'+r.type+'" data-topic="'+r.topic+'">'
+        + '<div class="top"><span class="type '+r.type+'">'+r.type+'</span>'+star+'</div>'
+        + '<h3>'+esc(r.title)+'</h3>'
+        + '<p>'+esc(r.desc)+'</p>'
+        + '<div class="rfoot"><span class="fmt"><i data-lucide="'+icon+'"></i>'+esc(r.format)+'</span>'
+        + '<button class="get" data-title="'+esc(r.title)+'" data-gated="'+(r.gated?'1':'0')+'">'+btn+' <i data-lucide="'+bicon+'"></i></button></div>'
+        + '</div>';
+    }
+
+    var grid = document.getElementById('grid');
+    grid.innerHTML = RESOURCES.map(cardHTML).join('') + '<div class="empty" hidden><b>Nothing here yet</b>Try a different type or topic.</div>';
+    document.getElementById('countNum').textContent = RESOURCES.length;
+    window.lucide && window.lucide.createIcons();
+
+    var empty = grid.querySelector('.empty');
+    var resCount = document.getElementById('resCount');
+    var clearBtn = document.getElementById('clearBtn');
+
+    function apply(){
+      var shown = 0;
+      grid.querySelectorAll('.res').forEach(function(el){
+        var okType = state.type === 'all' || el.getAttribute('data-type') === state.type;
+        var okTopic = state.topic === 'all' || el.getAttribute('data-topic') === state.topic;
+        var ok = okType && okTopic;
+        el.style.display = ok ? '' : 'none';
+        if (ok) shown++;
+      });
+      empty.hidden = shown > 0;
+      resCount.textContent = shown + (shown === 1 ? ' resource' : ' resources');
+      var filtered = state.type !== 'all' || state.topic !== 'all';
+      clearBtn.style.display = filtered ? 'inline-flex' : 'none';
+    }
+
+    document.getElementById('typeRow').addEventListener('click', function(e){
+      var b = e.target.closest('[data-type]'); if(!b) return;
+      state.type = b.getAttribute('data-type');
+      this.querySelectorAll('.pill').forEach(function(p){ p.classList.toggle('active', p === b); });
+      apply();
+    });
+    document.getElementById('topicRow').addEventListener('click', function(e){
+      var b = e.target.closest('[data-topic]'); if(!b) return;
+      state.topic = b.getAttribute('data-topic');
+      this.querySelectorAll('.pill').forEach(function(p){ p.classList.toggle('active', p === b); });
+      apply();
+    });
+    clearBtn.addEventListener('click', function(){
+      state.type = 'all'; state.topic = 'all';
+      document.querySelectorAll('#typeRow .pill').forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-type')==='all'); });
+      document.querySelectorAll('#topicRow .pill').forEach(function(p){ p.classList.toggle('active', p.getAttribute('data-topic')==='all'); });
+      apply();
+    });
+
+    // Email gate
+    var modal = document.getElementById('modal');
+    grid.addEventListener('click', function(e){
+      var b = e.target.closest('.get'); if(!b) return;
+      var title = b.getAttribute('data-title');
+      var gated = b.getAttribute('data-gated') === '1';
+      if (gated){
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalDesc').textContent = "Drop your email and I'll send \u201C" + title + "\u201D straight to your inbox — plus the weekly Signal.";
+        document.getElementById('modalSubject').value = "Free Library: " + title;
+        document.getElementById('modalFine').textContent = "No spam. Unsubscribe anytime.";
+        modal.classList.add('open');
+      } else {
+        // Instant resources: show a quick confirmation in place
+        b.innerHTML = 'Sent to your downloads <i data-lucide="check"></i>';
+        window.lucide && window.lucide.createIcons();
+      }
+    });
+    document.getElementById('modalX').addEventListener('click', function(){ modal.classList.remove('open'); });
+    modal.addEventListener('click', function(e){ if(e.target === modal) modal.classList.remove('open'); });
+    document.getElementById('modalForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      var form = this;
+      fetch(form.action, { method:'POST', body: new FormData(form), headers:{ Accept:'application/json' } })
+        .then(function(r){
+          document.getElementById('modalTitle').textContent = "Check your inbox! \uD83D\uDC9A";
+          document.getElementById('modalDesc').textContent = "It's on the way. If you don't see it in a minute, peek in spam.";
+          form.style.display = 'none';
+          document.getElementById('modalFine').textContent = "";
+        })
+        .catch(function(){ document.getElementById('modalFine').textContent = "Hmm, try again in a second."; });
+    });
+
+    // Theme toggle (shared with blog)
+    (function(){
+      var root = document.documentElement;
+      if (localStorage.getItem('oto-theme') === 'dark') root.setAttribute('data-theme','dark');
+      function paint(){
+        var btn = document.getElementById('themeBtn'); if(!btn) return;
+        var dark = root.getAttribute('data-theme') === 'dark';
+        btn.innerHTML = '<i data-lucide="'+(dark?'sun':'moon')+'"></i>';
+        window.lucide && window.lucide.createIcons();
+      }
+      document.getElementById('themeBtn').addEventListener('click', function(){
+        var dark = root.getAttribute('data-theme') === 'dark';
+        if(dark){ root.removeAttribute('data-theme'); localStorage.setItem('oto-theme','light'); }
+        else { root.setAttribute('data-theme','dark'); localStorage.setItem('oto-theme','dark'); }
+        paint();
+      });
+      setTimeout(paint, 40);
+    })();
+
+    apply();
+  </script>
+</body>
+</html>

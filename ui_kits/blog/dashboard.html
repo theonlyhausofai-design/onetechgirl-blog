@@ -1,0 +1,621 @@
+<!-- @dsCard group="Newsletter" viewport="1280x1000" name="Blog / Dashboard" subtitle="Manage posts — add, edit, publish, export" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dashboard — OneTechGirl</title>
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="posts-data.js"></script>
+<script src="posts.js"></script>
+<style>
+  body { margin: 0; background: var(--bg); color: var(--text); }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: var(--font-sans); }
+
+  /* ---- Topbar ---- */
+  .topbar { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; row-gap: 10px; padding: 16px 28px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .topbar .brand { display: flex; align-items: center; gap: 11px; }
+  .topbar .brand img { height: 24px; }
+  .topbar .brand b { font: var(--fw-bold) var(--text-md) var(--font-display); letter-spacing: -0.02em; }
+  .topbar .brand .pill { font: var(--fw-bold) var(--text-2xs) var(--font-sans); text-transform: uppercase; letter-spacing: 0.08em; background: var(--ink-950); color: #fff; padding: 4px 10px; border-radius: var(--radius-pill); margin-left: 2px; }
+  .topbar .search { margin-left: auto; position: relative; min-width: 0; }
+  .topbar .search input { width: 180px; max-width: 100%; height: 42px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--bg); padding: 0 16px 0 40px; font: var(--font-body); color: var(--text); outline: none; }
+  .topbar .search input:focus { border-color: var(--ink-950); }
+  .topbar .search i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 17px; height: 17px; color: var(--text-muted); }
+  .btn { height: 42px; padding: 0 18px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--surface); color: var(--text); font: var(--fw-semibold) var(--text-sm) var(--font-sans); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all var(--dur-fast) var(--ease-out); }
+  .btn:hover { border-color: var(--ink-950); }
+  .btn i { width: 16px; height: 16px; }
+  .btn.dark { background: var(--ink-950); color: #fff; border-color: var(--ink-950); }
+  .btn.dark:hover { filter: brightness(1.15); }
+  .btn.primary { background: var(--lime-400); color: var(--ink-950); border-color: var(--lime-400); }
+  .btn.primary:hover { background: var(--lime-500); border-color: var(--lime-500); }
+  .btn.primary:active, .btn.dark:active { transform: scale(0.97); }
+
+  .page { max-width: 1100px; margin: 0 auto; padding: 36px 28px 80px; }
+
+  /* ---- Stats ---- */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 32px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px 24px; }
+  .stat .n { font: var(--fw-bold) var(--text-2xl) var(--font-display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .stat .l { font: var(--fw-semibold) var(--text-2xs) var(--font-sans); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-top: 4px; }
+  .stat.accent { background: var(--lime-400); border-color: var(--lime-400); }
+  .stat.accent .l { color: var(--ink-700); }
+
+  /* ---- List ---- */
+  .listhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 16px; flex-wrap: wrap; }
+  .listhead h2 { font-size: var(--text-lg); letter-spacing: -0.02em; margin: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips button { font: var(--fw-semibold) var(--text-xs) var(--font-sans); padding: 7px 14px; border-radius: var(--radius-pill); border: 1.5px solid var(--border); background: transparent; color: var(--text); cursor: pointer; transition: all var(--dur-fast) var(--ease-out); }
+  .chips button:hover { border-color: var(--ink-950); }
+  .chips button.on { background: var(--ink-950); color: #fff; border-color: var(--ink-950); }
+
+  .list { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .row { display: grid; grid-template-columns: 40px 1fr 116px 92px 88px; align-items: center; gap: 16px; padding: 16px 22px; border-bottom: 1px solid var(--border); }
+  .row:last-child { border-bottom: none; }
+  .row.head { background: var(--surface-2); padding: 12px 22px; }
+  .row.head span { font: var(--fw-bold) var(--text-2xs) var(--font-sans); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+  .row .star { width: 30px; height: 30px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink-300); transition: color var(--dur-fast) var(--ease-out); }
+  .row .star:hover { color: var(--coral-500); }
+  .row .star.on { color: var(--coral-500); }
+  .row .star i { width: 18px; height: 18px; }
+  .row .ti b { font: var(--fw-semibold) var(--text-base) var(--font-display); letter-spacing: -0.01em; display: block; line-height: 1.2; }
+  .row .ti .sub { display: flex; align-items: center; gap: 8px; margin-top: 7px; flex-wrap: wrap; }
+  .cchip { font: var(--fw-bold) var(--text-2xs) var(--font-sans); text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 9px; border-radius: var(--radius-pill); white-space: nowrap; }
+  .cchip.lime { background: var(--lime-400); color: var(--ink-950); }
+  .cchip.coral { background: var(--coral-500); color: #fff; }
+  .cchip.ink { background: var(--ink-100); color: var(--ink-700); }
+  .row .ti .tags { font: var(--text-xs) var(--font-mono); color: var(--text-subtle); }
+  .status { font: var(--fw-bold) var(--text-2xs) var(--font-sans); text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 11px; border-radius: var(--radius-pill); display: inline-flex; align-items: center; gap: 6px; }
+  .status.published { background: var(--green-100); color: #137a52; }
+  .status.draft { background: var(--ink-100); color: var(--ink-600); }
+  .status .d { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .row .date { font: var(--text-sm) var(--font-mono); color: var(--text-muted); }
+  .row .acts { display: flex; gap: 6px; justify-content: flex-end; }
+  .row .acts button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); background: transparent; color: var(--ink-600); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all var(--dur-fast) var(--ease-out); }
+  .row .acts button:hover { border-color: var(--ink-950); color: var(--ink-950); }
+  .row .acts button.del:hover { border-color: var(--red-500); color: var(--red-500); background: var(--red-100); }
+  .row .acts i { width: 15px; height: 15px; }
+  .empty { padding: 48px 22px; text-align: center; color: var(--text-muted); font: var(--font-body); }
+
+  /* ---- Drawer (editor) ---- */
+  .backdrop { position: fixed; inset: 0; background: rgba(14,14,16,0.4); opacity: 0; pointer-events: none; transition: opacity var(--dur-base) var(--ease-out); z-index: 90; }
+  .backdrop.show { opacity: 1; pointer-events: auto; }
+  .drawer { position: fixed; top: 0; right: 0; height: 100%; width: 520px; max-width: 94vw; background: var(--surface); box-shadow: var(--shadow-xl); z-index: 100; transform: translateX(100%); transition: transform var(--dur-slow) var(--ease-out); display: flex; flex-direction: column; }
+  .drawer.show { transform: translateX(0); }
+  .drawer .dh { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+  .drawer .dh h3 { font-size: var(--text-lg); letter-spacing: -0.02em; margin: 0; }
+  .drawer .dh .x { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink-600); }
+  .drawer .dh .x:hover { border-color: var(--ink-950); color: var(--ink-950); }
+  .drawer .body { flex: 1; overflow-y: auto; padding: 22px 24px; }
+  .drawer .foot { display: flex; align-items: center; gap: 10px; padding: 16px 24px; border-top: 1px solid var(--border); }
+  .drawer .foot .del { margin-right: auto; color: var(--red-500); border-color: var(--red-100); }
+  .drawer .foot .del:hover { border-color: var(--red-500); background: var(--red-100); }
+
+  .field { margin-bottom: 18px; }
+  .field > label { display: block; font: var(--fw-semibold) var(--text-2xs) var(--font-sans); text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 8px; }
+  .field input[type=text], .field input[type=url], .field input[type=date], .field input[type=number], .field select { width: 100%; height: 46px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg); padding: 0 14px; font: var(--font-body); color: var(--text); outline: none; }
+  .field input:focus, .field select:focus { border-color: var(--ink-950); }
+  .field .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .seg { display: inline-flex; background: var(--surface-2); border-radius: var(--radius-pill); padding: 4px; gap: 4px; }
+  .seg button { border: none; background: transparent; padding: 8px 16px; border-radius: var(--radius-pill); font: var(--fw-semibold) var(--text-sm) var(--font-sans); color: var(--text-muted); cursor: pointer; }
+  .seg button.on { background: var(--ink-950); color: #fff; }
+  .swatches { display: flex; gap: 10px; }
+  .swatches button { width: 40px; height: 40px; border-radius: var(--radius-sm); border: 2px solid transparent; cursor: pointer; position: relative; }
+  .swatches button.on { border-color: var(--ink-950); }
+  .swatches .sw-lime { background: var(--lime-400); }
+  .swatches .sw-ink { background: var(--ink-950); }
+  .swatches .sw-coral { background: var(--coral-500); }
+  .hint { font: var(--text-xs) var(--font-sans); color: var(--text-subtle); margin-top: 7px; }
+
+  /* Rich text editor */
+  .rte-tools { display: flex; gap: 4px; flex-wrap: wrap; border: 1px solid var(--border); border-bottom: none; border-radius: var(--radius-md) var(--radius-md) 0 0; padding: 6px; background: var(--surface-2); }
+  .rte-tools button { min-width: 34px; height: 34px; padding: 0 9px; border: none; background: transparent; border-radius: var(--radius-sm); cursor: pointer; color: var(--ink-700); font: var(--fw-bold) var(--text-sm) var(--font-sans); display: inline-flex; align-items: center; justify-content: center; }
+  .rte-tools button:hover { background: var(--ink-100); color: var(--ink-950); }
+  .rte-tools i { width: 16px; height: 16px; }
+  .rte { border: 1px solid var(--border); border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 16px 16px; min-height: 220px; max-height: 360px; overflow-y: auto; outline: none; background: var(--bg); font: var(--fw-regular) var(--text-base)/1.65 var(--font-sans); color: var(--text); }
+  .rte:focus { border-color: var(--ink-950); }
+  .rte h2 { font-size: var(--text-lg); letter-spacing: -0.02em; margin: 18px 0 8px; }
+  .rte p { margin: 0 0 12px; }
+  .rte:empty::before { content: attr(data-ph); color: var(--text-subtle); }
+
+  /* Export modal */
+  .modal-wrap { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 110; opacity: 0; pointer-events: none; transition: opacity var(--dur-base) var(--ease-out); }
+  .modal-wrap.show { opacity: 1; pointer-events: auto; }
+  .modal { background: var(--surface); border-radius: var(--radius-xl); width: 620px; max-width: 100%; max-height: 86vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow-xl); }
+  .modal .mh { padding: 22px 26px 0; }
+  .modal .mh h3 { font-size: var(--text-xl); letter-spacing: -0.025em; margin: 0 0 8px; }
+  .modal .mh p { color: var(--text-muted); font: var(--font-body); margin: 0; }
+  .modal .mh ol { margin: 14px 0 0; padding-left: 20px; color: var(--ink-700); font: var(--font-body); }
+  .modal .mh ol li { margin-bottom: 4px; }
+  .modal .mh code { font: var(--text-sm) var(--font-mono); background: var(--ink-100); padding: 2px 6px; border-radius: 5px; }
+  .modal textarea { margin: 18px 26px; flex: 1; min-height: 180px; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; font: var(--text-xs) var(--font-mono); color: var(--ink-700); background: var(--bg); resize: none; outline: none; }
+  .modal .mf { display: flex; gap: 10px; justify-content: flex-end; padding: 0 26px 22px; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink-950); color: #fff; padding: 13px 20px; border-radius: var(--radius-pill); font: var(--fw-semibold) var(--text-sm) var(--font-sans); box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; transition: all var(--dur-base) var(--ease-out); z-index: 200; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 720px) {
+    .stats { grid-template-columns: 1fr; }
+    .topbar .search { order: 9; width: 100%; margin-left: 0; }
+    .topbar .search input { width: 100%; }
+    .row { grid-template-columns: 34px 1fr 80px; }
+    .row .date, .row.head .h-date { display: none; }
+    .row .acts { grid-column: 1 / -1; justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html" title="Go to blog home"><img src="../../assets/mark-oto-black.png" alt="oTo" /><b>OneTechGirl</b><span class="pill">Dashboard</span></a>
+    <div class="search"><i data-lucide="search"></i><input id="search" type="text" placeholder="Search posts…" /></div>
+    <button class="btn" id="helpBtn"><i data-lucide="circle-help"></i>Help</button>
+    <a class="btn" href="index.html" target="_blank"><i data-lucide="external-link"></i>View blog</a>
+    <button class="btn" id="exportBtn"><i data-lucide="download"></i>Export</button>
+    <button class="btn primary" id="newBtn"><i data-lucide="plus"></i><span id="newLabel">New post</span></button>
+  </header>
+
+  <main class="page">
+    <div class="stats" id="stats"></div>
+
+    <div class="listhead">
+      <div class="seg" id="modeSeg">
+        <button type="button" data-m="posts" class="on">Posts</button>
+        <button type="button" data-m="pages">Pages</button>
+      </div>
+      <div class="chips" id="chips">
+        <button class="on" data-f="all">All</button>
+        <button data-f="published">Published</button>
+        <button data-f="draft">Drafts</button>
+        <button data-f="ai-news">AI News</button>
+        <button data-f="tools">Tools</button>
+        <button data-f="explainers">Explainers</button>
+        <button data-f="tutorials">Tutorials</button>
+      </div>
+    </div>
+
+    <div class="list" id="list"></div>
+    <p class="hint" style="margin-top:14px">Changes save to this browser instantly and show on your blog preview. Use <b>Export</b> to download the data file and publish to your live site.
+      &nbsp;·&nbsp; <a id="resetLink" href="#" style="color:var(--link);text-decoration:underline">Reset to samples</a></p>
+  </main>
+
+  <!-- Editor drawer -->
+  <div class="backdrop" id="backdrop"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="dh">
+      <h3 id="drawerTitle">New post</h3>
+      <button class="x" id="closeDrawer" aria-label="Close"><i data-lucide="x"></i></button>
+    </div>
+    <div class="body">
+      <div class="field">
+        <label for="fTitle">Title</label>
+        <input id="fTitle" type="text" placeholder="ChatGPT can now remember you…" />
+      </div>
+      <div id="postFields">
+      <div class="field">
+        <label for="fDek">Excerpt</label>
+        <input id="fDek" type="text" placeholder="One-line summary shown on cards" />
+      </div>
+      <div class="field">
+        <div class="two">
+          <div>
+            <label for="fCat">Category</label>
+            <select id="fCat">
+              <option value="ai-news">AI News</option>
+              <option value="tools">Tools</option>
+              <option value="explainers">Explainers</option>
+              <option value="tutorials">Tutorials</option>
+            </select>
+          </div>
+          <div>
+            <label for="fDate">Date</label>
+            <input id="fDate" type="date" />
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <div class="two">
+          <div>
+            <label for="fRead">Read time (min)</label>
+            <input id="fRead" type="number" min="1" max="60" placeholder="5" />
+          </div>
+          <div>
+            <label for="fIssue">Issue # (optional)</label>
+            <input id="fIssue" type="number" min="1" placeholder="48" />
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cover</label>
+        <div class="swatches" id="swatches">
+          <button type="button" class="sw-lime" data-c="lime" aria-label="Lime"></button>
+          <button type="button" class="sw-ink" data-c="ink" aria-label="Ink"></button>
+          <button type="button" class="sw-coral" data-c="coral" aria-label="Coral"></button>
+        </div>
+        <input id="fCover" type="url" placeholder="…or paste an image URL" style="margin-top:10px" />
+        <div class="hint">Pick a color block, or paste an image URL to use a photo.</div>
+      </div>
+      <div class="field">
+        <label for="fTags">Tags</label>
+        <input id="fTags" type="text" placeholder="OpenAI, Memory, ChatGPT" />
+        <div class="hint">Comma-separated.</div>
+      </div>
+      </div>
+      <div class="field">
+        <label>Status &amp; visibility</label>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div class="seg" id="statusSeg">
+            <button type="button" data-s="published" class="on">Published</button>
+            <button type="button" data-s="draft">Draft</button>
+          </div>
+          <label id="featuredWrap" style="display:inline-flex;align-items:center;gap:8px;font:var(--font-label);text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer">
+            <input id="fFeatured" type="checkbox" style="width:18px;height:18px;accent-color:var(--coral-500)" /> Featured post
+          </label>
+          <label id="navWrap" style="display:none;align-items:center;gap:8px;font:var(--font-label);text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer">
+            <input id="fNav" type="checkbox" style="width:18px;height:18px;accent-color:var(--coral-500)" /> Show in footer
+          </label>
+          <label id="formWrap" style="display:none;align-items:center;gap:8px;font:var(--font-label);text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer">
+            <input id="fForm" type="checkbox" style="width:18px;height:18px;accent-color:var(--coral-500)" /> Contact form
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Body</label>
+        <div class="rte-tools" id="rteTools">
+          <button type="button" data-cmd="bold" title="Bold"><b>B</b></button>
+          <button type="button" data-cmd="italic" title="Italic"><i style="font-style:italic">I</i></button>
+          <button type="button" data-cmd="h2" title="Heading">H2</button>
+          <button type="button" data-cmd="insertUnorderedList" title="Bulleted list"><i data-lucide="list"></i></button>
+          <button type="button" data-cmd="insertOrderedList" title="Numbered list"><i data-lucide="list-ordered"></i></button>
+          <button type="button" data-cmd="createLink" title="Link"><i data-lucide="link"></i></button>
+        </div>
+        <div class="rte" id="fBody" contenteditable="true" data-ph="Write the post…"></div>
+      </div>
+    </div>
+    <div class="foot">
+      <button class="btn del" id="deleteBtn" style="display:none"><i data-lucide="trash-2"></i>Delete</button>
+      <button class="btn" id="cancelBtn">Cancel</button>
+      <button class="btn primary" id="saveBtn"><i data-lucide="check"></i>Save post</button>
+    </div>
+  </aside>
+
+  <!-- Export modal -->
+  <div class="modal-wrap" id="exportModal">
+    <div class="modal">
+      <div class="mh">
+        <h3>Publish to your live site</h3>
+        <p>Your edits are saved in this browser. To publish them everywhere:</p>
+        <ol>
+          <li><b>Download</b> the data file below (<code>posts-data.js</code>).</li>
+          <li>Replace <code>posts-data.js</code> in your blog folder with it.</li>
+          <li>Re-deploy (or drag the folder back to your host).</li>
+        </ol>
+      </div>
+      <textarea id="exportCode" readonly spellcheck="false"></textarea>
+      <div class="mf">
+        <button class="btn" id="copyCode"><i data-lucide="copy"></i>Copy</button>
+        <button class="btn" id="closeExport">Close</button>
+        <button class="btn primary" id="downloadCode"><i data-lucide="download"></i>Download posts-data.js</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-wrap" id="helpModal">
+    <div class="modal">
+      <div class="mh">
+        <h3>Using your dashboard</h3>
+        <p>This is your control room. Changes save to your browser instantly and preview on the blog — to go live, you Export.</p>
+        <ol>
+          <li><b>Posts / Pages tabs</b> (top-left) — switch between blog posts and standalone pages like About or Contact.</li>
+          <li><b>New post</b> — fill in the details, write the body with the toolbar (bold, headings, lists, links), then Save.</li>
+          <li><b>Edit / delete</b> — the pencil and trash icons on each row.</li>
+          <li><b>Featured star</b> — sets the big hero post on the home page (only one at a time).</li>
+          <li><b>Draft vs Published</b> — drafts stay hidden from the public blog.</li>
+          <li><b>Search &amp; filter chips</b> — find posts fast by title, category, or status.</li>
+        </ol>
+        <p style="margin-top:14px"><b>To publish to your live site:</b> click <code>Export</code> → <code>Download posts-data.js</code>, replace that file in your blog folder, then re-deploy.</p>
+      </div>
+      <div class="mf">
+        <button class="btn primary" id="closeHelp">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    if (!window.OTO) { document.getElementById('list').innerHTML = '<div class="empty">Could not load posts data.</div>'; return; }
+    var posts = OTO.load();
+    var pages = OTO.loadPages();
+    var mode = 'posts';
+    var filterF = 'all';
+    var query = '';
+    var editingId = null;
+    var coverColor = 'lime';
+    var status = 'published';
+
+    var $ = function(id){ return document.getElementById(id); };
+    function icons(){ window.lucide && window.lucide.createIcons(); }
+    function save(){ OTO.save(posts); }
+    function savePages(){ OTO.savePages(pages); }
+    function byDate(a,b){ return (b.date||'').localeCompare(a.date||''); }
+    function toast(msg){ var t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._t); t._t = setTimeout(function(){ t.classList.remove('show'); }, 2200); }
+
+    function statsHTML(){
+      var arr = mode === 'pages' ? pages : posts;
+      var pub = arr.filter(function(p){ return p.status==='published'; }).length;
+      var noun = mode === 'pages' ? 'pages' : 'posts';
+      return ''
+        + '<div class="stat accent"><div class="n">'+arr.length+'</div><div class="l">Total '+noun+'</div></div>'
+        + '<div class="stat"><div class="n">'+pub+'</div><div class="l">Published</div></div>'
+        + '<div class="stat"><div class="n">'+(arr.length-pub)+'</div><div class="l">Drafts</div></div>';
+    }
+
+    function matches(p){
+      if (query && (p.title||'').toLowerCase().indexOf(query) === -1) return false;
+      if (filterF === 'all') return true;
+      if (filterF === 'published' || filterF === 'draft') return p.status === filterF;
+      return p.category === filterF;
+    }
+
+    function rowHTML(p){
+      var c = OTO.cat(p.category);
+      var tags = (p.tags||[]).join(', ');
+      return '<div class="row" data-id="'+OTO.esc(p.id)+'">'
+        + '<button class="star '+(p.featured?'on':'')+'" data-act="feature" title="Featured post"><i data-lucide="star"></i></button>'
+        + '<div class="ti"><b>'+OTO.esc(p.title||'Untitled')+'</b><div class="sub"><span class="cchip '+c.color+'">'+OTO.esc(c.label)+'</span>'+(OTO.isArchived(p)?'<span class="cchip ink">Archived</span>':'')+(tags?'<span class="tags">'+OTO.esc(tags)+'</span>':'')+'</div></div>'
+        + '<div><span class="status '+(p.status==='published'?'published':'draft')+'"><span class="d"></span>'+(p.status==='published'?'Published':'Draft')+'</span></div>'
+        + '<div class="date">'+OTO.esc(OTO.fmtDate(p.date,'long').replace(', 2026',''))+'</div>'
+        + '<div class="acts"><button data-act="edit" title="Edit"><i data-lucide="pencil"></i></button><button class="del" data-act="delete" title="Delete"><i data-lucide="trash-2"></i></button></div>'
+        + '</div>';
+    }
+
+    function render(){
+      $('newLabel').textContent = mode === 'pages' ? 'New page' : 'New post';
+      $('chips').style.display = mode === 'pages' ? 'none' : '';
+      $('stats').innerHTML = statsHTML();
+      var head, rowsHTML;
+      if (mode === 'pages'){
+        var pr = pages.slice().filter(function(p){ return !query || (p.title||'').toLowerCase().indexOf(query) > -1; });
+        head = '<div class="row head"><span></span><span>Title</span><span>Status</span><span class="h-date">URL</span><span style="text-align:right">Actions</span></div>';
+        rowsHTML = pr.length ? pr.map(pageRowHTML).join('') : '<div class="empty">No pages yet. <a href="#" id="emptyNew" style="color:var(--link);text-decoration:underline">Create one</a>.</div>';
+      } else {
+        var rows = posts.slice().sort(byDate).filter(matches);
+        head = '<div class="row head"><span></span><span>Title</span><span>Status</span><span class="h-date">Date</span><span style="text-align:right">Actions</span></div>';
+        rowsHTML = rows.length ? rows.map(rowHTML).join('') : '<div class="empty">No posts match. Try a different filter or <a href="#" id="emptyNew" style="color:var(--link);text-decoration:underline">create one</a>.</div>';
+      }
+      $('list').innerHTML = head + rowsHTML;
+      icons();
+    }
+
+    function pageRowHTML(p){
+      return '<div class="row" data-id="'+OTO.esc(p.id)+'">'
+        + '<span class="star" style="cursor:default;color:var(--ink-300)"><i data-lucide="file-text"></i></span>'
+        + '<div class="ti"><b>'+OTO.esc(p.title||'Untitled')+'</b><div class="sub"><span class="tags">page.html?slug='+OTO.esc(p.id)+'</span>'+(p.nav!==false?'<span class="cchip ink">In footer</span>':'')+'</div></div>'
+        + '<div><span class="status '+(p.status==='published'?'published':'draft')+'"><span class="d"></span>'+(p.status==='published'?'Published':'Draft')+'</span></div>'
+        + '<div class="date">—</div>'
+        + '<div class="acts"><button data-act="edit" title="Edit"><i data-lucide="pencil"></i></button><button class="del" data-act="delete" title="Delete"><i data-lucide="trash-2"></i></button></div>'
+        + '</div>';
+    }
+
+    // ---- Editor ----
+    function setStatus(s){ status = s; Array.prototype.forEach.call($('statusSeg').children, function(b){ b.classList.toggle('on', b.getAttribute('data-s')===s); }); }
+    function setCover(c){ coverColor = c; Array.prototype.forEach.call($('swatches').children, function(b){ b.classList.toggle('on', b.getAttribute('data-c')===c); }); }
+
+    function openEditor(id){
+      editingId = id;
+      $('backdrop').classList.add('show');
+      $('drawer').classList.add('show');
+      if (mode === 'pages'){
+        var pg = id ? pages.find(function(x){ return x.id===id; }) : null;
+        $('drawerTitle').textContent = pg ? 'Edit page' : 'New page';
+        $('deleteBtn').style.display = pg ? '' : 'none';
+        $('postFields').style.display = 'none';
+        $('featuredWrap').style.display = 'none';
+        $('navWrap').style.display = 'inline-flex';
+        $('formWrap').style.display = 'inline-flex';
+        $('fTitle').value = pg ? (pg.title||'') : '';
+        $('fNav').checked = pg ? (pg.nav !== false) : true;
+        $('fForm').checked = pg ? !!pg.form : false;
+        setStatus(pg ? (pg.status||'published') : 'published');
+        $('fBody').innerHTML = pg ? (pg.body||'') : '';
+      } else {
+        var p = id ? posts.find(function(x){ return x.id===id; }) : null;
+        $('drawerTitle').textContent = p ? 'Edit post' : 'New post';
+        $('deleteBtn').style.display = p ? '' : 'none';
+        $('postFields').style.display = 'block';
+        $('featuredWrap').style.display = 'inline-flex';
+        $('navWrap').style.display = 'none';
+        $('formWrap').style.display = 'none';
+        $('fTitle').value = p ? (p.title||'') : '';
+        $('fDek').value = p ? (p.dek||'') : '';
+        $('fCat').value = p ? (p.category||'ai-news') : 'ai-news';
+        $('fDate').value = p ? (p.date||'') : new Date().toISOString().slice(0,10);
+        $('fRead').value = p && p.readTime ? p.readTime : '';
+        $('fIssue').value = p && p.issue ? p.issue : '';
+        $('fTags').value = p && p.tags ? p.tags.join(', ') : '';
+        $('fFeatured').checked = p ? !!p.featured : false;
+        var cov = (p && p.cover) || {};
+        $('fCover').value = cov.type === 'image' ? (cov.url||'') : '';
+        setCover(cov.color || OTO.cat($('fCat').value).color);
+        setStatus(p ? (p.status||'published') : 'published');
+        $('fBody').innerHTML = p ? (p.body||'') : '';
+      }
+      icons();
+      setTimeout(function(){ $('fTitle').focus(); }, 80);
+    }
+    function closeEditor(){ $('backdrop').classList.remove('show'); $('drawer').classList.remove('show'); editingId = null; }
+
+    function collect(){
+      var title = $('fTitle').value.trim();
+      if (!title){ toast('Add a title first'); $('fTitle').focus(); return null; }
+      if (mode === 'pages'){
+        return { title: title, status: status, nav: $('fNav').checked, form: $('fForm').checked, body: $('fBody').innerHTML.trim() };
+      }
+      var coverUrl = $('fCover').value.trim();
+      var cover = coverUrl ? { type:'image', url: coverUrl } : { type:'hatch', color: coverColor };
+      var tags = $('fTags').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+      var read = parseInt($('fRead').value, 10);
+      var issue = parseInt($('fIssue').value, 10);
+      return {
+        title: title,
+        dek: $('fDek').value.trim(),
+        category: $('fCat').value,
+        date: $('fDate').value || new Date().toISOString().slice(0,10),
+        readTime: isNaN(read) ? null : read,
+        issue: isNaN(issue) ? null : issue,
+        tags: tags,
+        cover: cover,
+        featured: $('fFeatured').checked,
+        status: status,
+        body: $('fBody').innerHTML.trim()
+      };
+    }
+
+    function saveEditor(){
+      var data = collect();
+      if (!data) return;
+      if (mode === 'pages'){
+        if (editingId){ Object.assign(pages.find(function(x){ return x.id===editingId; }), data); }
+        else {
+          var pid = OTO.slugify(data.title), pb = pid, pi = 2;
+          while (pages.some(function(p){ return p.id===pid; })){ pid = pb + '-' + (pi++); }
+          data.id = pid; pages.unshift(data);
+        }
+        savePages(); render(); closeEditor();
+        toast(editingId ? 'Page updated' : 'Page created');
+        return;
+      }
+      if (data.featured){ posts.forEach(function(p){ if (p.id !== editingId) p.featured = false; }); }
+      if (editingId){
+        var p = posts.find(function(x){ return x.id===editingId; });
+        Object.assign(p, data);
+      } else {
+        var id = OTO.slugify(data.title);
+        var base = id, i = 2; while (posts.some(function(p){ return p.id===id; })){ id = base + '-' + (i++); }
+        data.id = id;
+        posts.unshift(data);
+      }
+      save(); render(); closeEditor();
+      toast(editingId ? 'Post updated' : 'Post created');
+    }
+
+    function deleteItem(id){
+      if (mode === 'pages'){
+        var pg = pages.find(function(x){ return x.id===id; });
+        if (!pg) return;
+        if (!confirm('Delete “'+(pg.title||'this page')+'”? This can\'t be undone.')) return;
+        pages = pages.filter(function(x){ return x.id!==id; });
+        savePages(); render();
+        if (editingId === id) closeEditor();
+        toast('Page deleted');
+        return;
+      }
+      var p = posts.find(function(x){ return x.id===id; });
+      if (!p) return;
+      if (!confirm('Delete “'+(p.title||'this post')+'”? This can\'t be undone.')) return;
+      posts = posts.filter(function(x){ return x.id!==id; });
+      save(); render();
+      if (editingId === id) closeEditor();
+      toast('Post deleted');
+    }
+
+    // ---- Events ----
+    $('newBtn').addEventListener('click', function(){ openEditor(null); });
+    $('closeDrawer').addEventListener('click', closeEditor);
+    $('cancelBtn').addEventListener('click', closeEditor);
+    $('backdrop').addEventListener('click', closeEditor);
+    $('saveBtn').addEventListener('click', saveEditor);
+    $('deleteBtn').addEventListener('click', function(){ if (editingId) deleteItem(editingId); });
+
+    $('list').addEventListener('click', function(e){
+      var btn = e.target.closest('[data-act]');
+      if (btn){
+        var row = e.target.closest('.row'); var id = row && row.getAttribute('data-id');
+        var act = btn.getAttribute('data-act');
+        if (act === 'edit') openEditor(id);
+        else if (act === 'delete') deleteItem(id);
+        else if (act === 'feature'){
+          var p = posts.find(function(x){ return x.id===id; });
+          var turnOn = !p.featured;
+          posts.forEach(function(x){ x.featured = false; });
+          p.featured = turnOn;
+          save(); render();
+        }
+        return;
+      }
+      if (e.target.id === 'emptyNew'){ e.preventDefault(); openEditor(null); }
+    });
+
+    $('search').addEventListener('input', function(){ query = this.value.trim().toLowerCase(); render(); });
+    $('chips').addEventListener('click', function(e){
+      var b = e.target.closest('button'); if (!b) return;
+      filterF = b.getAttribute('data-f');
+      Array.prototype.forEach.call($('chips').children, function(x){ x.classList.toggle('on', x===b); });
+      render();
+    });
+    $('modeSeg').addEventListener('click', function(e){
+      var b = e.target.closest('button'); if (!b) return;
+      mode = b.getAttribute('data-m');
+      Array.prototype.forEach.call(this.children, function(x){ x.classList.toggle('on', x===b); });
+      query = ''; $('search').value = '';
+      filterF = 'all';
+      Array.prototype.forEach.call($('chips').children, function(x){ x.classList.toggle('on', x.getAttribute('data-f')==='all'); });
+      render();
+    });
+    $('statusSeg').addEventListener('click', function(e){ var b = e.target.closest('button'); if (b) setStatus(b.getAttribute('data-s')); });
+    $('swatches').addEventListener('click', function(e){ var b = e.target.closest('button'); if (b){ setCover(b.getAttribute('data-c')); $('fCover').value=''; } });
+
+    // Rich text
+    $('rteTools').addEventListener('mousedown', function(e){ e.preventDefault(); });
+    $('rteTools').addEventListener('click', function(e){
+      var b = e.target.closest('button'); if (!b) return;
+      var cmd = b.getAttribute('data-cmd');
+      $('fBody').focus();
+      if (cmd === 'h2'){ document.execCommand('formatBlock', false, 'h2'); }
+      else if (cmd === 'createLink'){ var url = prompt('Link URL:', 'https://'); if (url) document.execCommand('createLink', false, url); }
+      else { document.execCommand(cmd, false, null); }
+    });
+
+    $('resetLink').addEventListener('click', function(e){
+      e.preventDefault();
+      if (mode === 'pages'){
+        if (!confirm('Reset pages to the samples? Your page changes in this browser will be cleared.')) return;
+        OTO.resetPages(); pages = OTO.loadPages(); render(); toast('Pages reset');
+      } else {
+        if (!confirm('Reset posts to the samples? Your post changes in this browser will be cleared.')) return;
+        OTO.reset(); posts = OTO.load(); render(); toast('Posts reset');
+      }
+    });
+
+    // Export
+    function openExport(){ $('exportCode').value = OTO.exportSource(); $('exportModal').classList.add('show'); }
+    $('helpBtn').addEventListener('click', function(){ $('helpModal').classList.add('show'); });
+    $('closeHelp').addEventListener('click', function(){ $('helpModal').classList.remove('show'); });
+    $('helpModal').addEventListener('click', function(e){ if (e.target === this) this.classList.remove('show'); });
+    $('exportBtn').addEventListener('click', openExport);
+    $('closeExport').addEventListener('click', function(){ $('exportModal').classList.remove('show'); });
+    $('exportModal').addEventListener('click', function(e){ if (e.target === this) this.classList.remove('show'); });
+    $('copyCode').addEventListener('click', function(){
+      var ta = $('exportCode'); ta.select();
+      try { document.execCommand('copy'); toast('Copied to clipboard'); } catch(err){ toast('Press Ctrl/Cmd+C to copy'); }
+    });
+    $('downloadCode').addEventListener('click', function(){
+      var blob = new Blob([OTO.exportSource()], { type: 'text/javascript' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = 'posts-data.js';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+      toast('Downloaded posts-data.js');
+    });
+
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape'){ closeEditor(); $('exportModal').classList.remove('show'); $('helpModal').classList.remove('show'); } });
+
+    render();
+    setTimeout(icons, 50);
+  })();
+  </script>
+</body>
+</html>

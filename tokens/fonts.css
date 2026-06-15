@@ -1,0 +1,42 @@
+/* ============================================================
+   OneTechGirl — Webfonts
+   Space Grotesk (SIL OFL 1.1). Variable + static fallbacks.
+   ============================================================ */
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 700;
+  src: url("../assets/fonts/SpaceGrotesk-Variable.ttf") format("truetype-variations");
+}
+
+/* Static fallbacks (named weights) for engines without variable support */
+@font-face {
+  font-family: "Space Grotesk Static";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("../assets/fonts/SpaceGrotesk-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Space Grotesk Static";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url("../assets/fonts/SpaceGrotesk-Medium.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Space Grotesk Static";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url("../assets/fonts/SpaceGrotesk-SemiBold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Space Grotesk Static";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url("../assets/fonts/SpaceGrotesk-Bold.ttf") format("truetype");
+}
